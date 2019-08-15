@@ -11,7 +11,7 @@ class Signer {
 
   Signer(this.credentials): assert(credentials != null);
 
-  Map<String, Object> sign({
+  Map<String, String> sign({
     @required String httpMethod,
     @required String resourcePath,
     Map<String, String> parameters,
