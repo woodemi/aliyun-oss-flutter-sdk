@@ -10,6 +10,30 @@ class OSSClient {
 
   OSSClient(this.endpoint, this.credentialProvider);
 
+  // TODO Optional arguments
+  Future<String> getBucket(String bucket, String prefix) async {
+    var credentials = await credentialProvider.getCredentials();
+
+    var signer = Signer(credentials);
+    var signedHeaders = signer.sign(
+      httpMethod: 'GET',
+      resourcePath: '/$bucket/',
+    );
+
+    var queryParams = {
+      'prefix': prefix,
+    };
+    var queryString = queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+    var queryAppendix = (queryString != null ? '?$queryString' : '');
+
+    var response = await http.get(
+      "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
+      headers: signedHeaders,
+    );
+    // TODO Handle exception
+    return response.body;
+  }
+
   Future<Uint8List> getObject(String bucket, String objectKey) async {
     var credentials = await credentialProvider.getCredentials();
 
