@@ -33,6 +33,11 @@ class TestFederationCredentialProvider extends FederationCredentialProvider {
 }
 
 void testOSSApi() {
+  test('test getBucket', () async {
+    var response = await _ossClient.getBucket(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_PREFIX']);
+    expect(response, isNotNull);
+  });
+
   test('test getObject', () async {
     var responseData = await _ossClient.getObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
     expect(responseData, isNotNull);
