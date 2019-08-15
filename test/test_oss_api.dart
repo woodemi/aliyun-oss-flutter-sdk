@@ -42,4 +42,9 @@ void testOSSApi() {
     var responseData = await _ossClient.getObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
     expect(responseData, isNotNull);
   });
+
+  test('test deleteObject', () async {
+    var responseData = await _ossClient.deleteObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
+    expect(responseData, isNotNull);
+  });
 }

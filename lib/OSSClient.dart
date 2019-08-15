@@ -50,4 +50,21 @@ class OSSClient {
     // TODO Handle exception
     return response.bodyBytes;
   }
+
+  Future<String> deleteObject(String bucket, String objectKey) async {
+    var credentials = await credentialProvider.getCredentials();
+
+    var signer = Signer(credentials);
+    var signedHeaders = signer.sign(
+      httpMethod: 'DELETE',
+      resourcePath: '/$bucket/$objectKey',
+    );
+
+    var response = await http.delete(
+      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+      headers: signedHeaders,
+    );
+    // TODO Handle exception
+    return response.body;
+  }
 }
