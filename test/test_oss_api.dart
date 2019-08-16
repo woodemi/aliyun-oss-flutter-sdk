@@ -32,16 +32,20 @@ class TestFederationCredentialProvider extends FederationCredentialProvider {
   }
 }
 
+var bucket = Platform.environment['TEST_BUCKET'];
+var prefix = Platform.environment['TEST_PREFIX'];
+var objectKey = Platform.environment['TEST_OBJECT_KEY'];
+
 void testOSSApi() {
   test('test getBucket', () async {
-    var response = await _ossClient.getBucket(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_PREFIX']);
+    var response = await _ossClient.getBucket(bucket, prefix);
     expect(response, isNotNull);
   });
 
   test('test putObject', () async {
     var response = await _ossClient.putObject(
-      bucket: Platform.environment['TEST_BUCKET'],
-      objectKey: Platform.environment['TEST_OBJECT_KEY'],
+      bucket: bucket,
+      objectKey: objectKey,
       content: null, // FIXME
       contentType: ContentType.text.value,
     );
@@ -49,12 +53,12 @@ void testOSSApi() {
   });
 
   test('test getObject', () async {
-    var responseData = await _ossClient.getObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
+    var responseData = await _ossClient.getObject(bucket, objectKey);
     expect(responseData, isNotNull);
   });
 
   test('test deleteObject', () async {
-    var responseData = await _ossClient.deleteObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
+    var responseData = await _ossClient.deleteObject(bucket, objectKey);
     expect(responseData, isNotNull);
   });
 }
