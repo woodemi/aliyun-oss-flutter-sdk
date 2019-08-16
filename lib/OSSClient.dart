@@ -34,7 +34,9 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.body;
   }
 
@@ -67,7 +69,9 @@ class OSSClient {
       body: content,
       encoding: encoding != null ? Encoding.getByName(encoding) : null,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.body;
   }
 
@@ -84,7 +88,9 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.bodyBytes;
   }
 
@@ -101,7 +107,9 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.body;
   }
 }
