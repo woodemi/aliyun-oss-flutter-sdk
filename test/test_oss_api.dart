@@ -39,11 +39,10 @@ void testOSSApi() {
   });
 
   test('test putObject', () async {
-    var objectContent = Platform.environment['TEST_OBJECT_CONENT'];
     var response = await _ossClient.putObject(
       bucket: Platform.environment['TEST_BUCKET'],
       objectKey: Platform.environment['TEST_OBJECT_KEY'],
-      content: utf8.encode(objectContent),
+      content: null, // FIXME
       contentType: ContentType.text.value,
     );
     expect(response, isNotNull);
