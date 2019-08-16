@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/sign.dart';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 
 class OSSClient {
   String endpoint;
@@ -29,6 +33,39 @@ class OSSClient {
     var response = await http.get(
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
+    );
+    // TODO Handle exception
+    return response.body;
+  }
+
+  Future<String> putObject({
+    @required String bucket,
+    @required String objectKey,
+    @required Uint8List content,
+    @required String contentType,
+    String encoding,
+  }) async {
+    var originHeaders = {
+      HttpHeaders.contentTypeHeader: contentType,
+    };
+
+    var credentials = await credentialProvider.getCredentials();
+    var signer = Signer(credentials);
+    var safeHeaders = signer.sign(
+      httpMethod: 'PUT',
+      resourcePath: '/$bucket/$objectKey',
+      headers: originHeaders,
+      contentMd5: base64.encode(md5.convert(content).bytes),
+    );
+
+    var response = await http.put(
+      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+      headers: {
+        ...originHeaders,
+        ...safeHeaders,
+      },
+      body: content,
+      encoding: encoding != null ? Encoding.getByName(encoding) : null,
     );
     // TODO Handle exception
     return response.body;
