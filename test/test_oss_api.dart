@@ -38,6 +38,16 @@ void testOSSApi() {
     expect(response, isNotNull);
   });
 
+  test('test putObject', () async {
+    var response = await _ossClient.putObject(
+      bucket: Platform.environment['TEST_BUCKET'],
+      objectKey: Platform.environment['TEST_OBJECT_KEY'],
+      content: null, // FIXME
+      contentType: ContentType.text.value,
+    );
+    expect(response, isNotNull);
+  });
+
   test('test getObject', () async {
     var responseData = await _ossClient.getObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
     expect(responseData, isNotNull);
