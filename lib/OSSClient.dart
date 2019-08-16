@@ -14,9 +14,12 @@ class OSSClient {
 
   OSSClient(this.endpoint, this.credentialProvider);
 
+  @visibleForTesting
+  Future<Credentials> getCredentials() => credentialProvider.getCredentials();
+
   // TODO Optional arguments
   Future<String> getBucket(String bucket, String prefix) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
@@ -34,7 +37,9 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.body;
   }
 
@@ -49,7 +54,7 @@ class OSSClient {
       HttpHeaders.contentTypeHeader: contentType,
     };
 
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
     var signer = Signer(credentials);
     var safeHeaders = signer.sign(
       httpMethod: 'PUT',
@@ -67,12 +72,14 @@ class OSSClient {
       body: content,
       encoding: encoding != null ? Encoding.getByName(encoding) : null,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.body;
   }
 
   Future<Uint8List> getObject(String bucket, String objectKey) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
@@ -84,12 +91,14 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('HTTP Error'); // TODO
+    }
     return response.bodyBytes;
   }
 
   Future<String> deleteObject(String bucket, String objectKey) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
@@ -101,7 +110,10 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    // TODO Handle exception
+    // FIXME Delete empty file fails
+//    if (response.statusCode != HttpStatus.ok) {
+//      throw Exception('HTTP Error'); // TODO
+//    }
     return response.body;
   }
 }

@@ -1,47 +1,25 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:aliyun_oss/OSSClient.dart';
-import 'package:aliyun_oss/common.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 
-var _ossClient = OSSClient(Platform.environment['OSS_ENDPOINT'], TestFederationCredentialProvider());
+import 'TestOSSClient.dart';
 
-class TestFederationCredentialProvider extends FederationCredentialProvider {
-  final String fetchCredentialsApi = Platform.environment['FETCH_CREDENTIALS_API'];
-  final String accessToken = Platform.environment['ACCESS_TOKEN'];
-  final String appId = Platform.environment['APP_ID'];
+var _ossClient = TestOSSClient();
 
-  @override
-  Future<FederationCredentials> fetchFederationCredentials() async {
-    var response = await http.post(
-      fetchCredentialsApi,
-      headers: {
-        HttpHeaders.contentTypeHeader: ContentType.json.value
-      },
-      body: jsonEncode({
-        'appId': appId,
-        'accessToken': accessToken,
-        'appTimestamp': DateTime.now().millisecondsSinceEpoch,
-      })
-    );
-
-    var map = jsonDecode(response.body)['data']['auth'];
-    return FederationCredentials.fromMap(map);
-  }
-}
+var bucket = Platform.environment['TEST_BUCKET'];
+var prefix = Platform.environment['TEST_PREFIX'];
+var objectKey = Platform.environment['TEST_OBJECT_KEY'];
 
 void testOSSApi() {
   test('test getBucket', () async {
-    var response = await _ossClient.getBucket(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_PREFIX']);
+    var response = await _ossClient.getBucket(bucket, prefix);
     expect(response, isNotNull);
   });
 
   test('test putObject', () async {
     var response = await _ossClient.putObject(
-      bucket: Platform.environment['TEST_BUCKET'],
-      objectKey: Platform.environment['TEST_OBJECT_KEY'],
+      bucket: bucket,
+      objectKey: objectKey,
       content: null, // FIXME
       contentType: ContentType.text.value,
     );
@@ -49,12 +27,12 @@ void testOSSApi() {
   });
 
   test('test getObject', () async {
-    var responseData = await _ossClient.getObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
+    var responseData = await _ossClient.getObject(bucket, objectKey);
     expect(responseData, isNotNull);
   });
 
   test('test deleteObject', () async {
-    var responseData = await _ossClient.deleteObject(Platform.environment['TEST_BUCKET'], Platform.environment['TEST_OBJECT_KEY']);
+    var responseData = await _ossClient.deleteObject(bucket, objectKey);
     expect(responseData, isNotNull);
   });
 }
