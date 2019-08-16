@@ -61,7 +61,6 @@ class OSSClient {
       httpMethod: 'PUT',
       resourcePath: '/$bucket/$objectKey',
       headers: originHeaders,
-      contentMd5: content?.isNotEmpty == true ? base64.encode(md5.convert(content).bytes) : null,
     );
 
     var response = await http.put(
