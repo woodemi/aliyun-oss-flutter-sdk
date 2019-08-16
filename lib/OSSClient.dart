@@ -14,9 +14,12 @@ class OSSClient {
 
   OSSClient(this.endpoint, this.credentialProvider);
 
+  @visibleForTesting
+  Future<Credentials> getCredentials() => credentialProvider.getCredentials();
+
   // TODO Optional arguments
   Future<String> getBucket(String bucket, String prefix) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
@@ -51,7 +54,7 @@ class OSSClient {
       HttpHeaders.contentTypeHeader: contentType,
     };
 
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
     var signer = Signer(credentials);
     var safeHeaders = signer.sign(
       httpMethod: 'PUT',
@@ -76,7 +79,7 @@ class OSSClient {
   }
 
   Future<Uint8List> getObject(String bucket, String objectKey) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
@@ -95,7 +98,7 @@ class OSSClient {
   }
 
   Future<String> deleteObject(String bucket, String objectKey) async {
-    var credentials = await credentialProvider.getCredentials();
+    var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var signedHeaders = signer.sign(
