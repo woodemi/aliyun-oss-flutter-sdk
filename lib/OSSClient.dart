@@ -110,9 +110,10 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    if (response.statusCode != HttpStatus.ok) {
-      throw Exception('HTTP Error'); // TODO
-    }
+    // FIXME Delete empty file fails
+//    if (response.statusCode != HttpStatus.ok) {
+//      throw Exception('HTTP Error'); // TODO
+//    }
     return response.body;
   }
 }
