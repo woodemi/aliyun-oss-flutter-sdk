@@ -38,7 +38,8 @@ class OSSClient {
       headers: signedHeaders,
     );
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('HTTP Error'); // TODO
+      print(response.body);
+      throw Exception('HTTP Error ${response.statusCode}'); // TODO
     }
     return response.body;
   }
@@ -60,7 +61,6 @@ class OSSClient {
       httpMethod: 'PUT',
       resourcePath: '/$bucket/$objectKey',
       headers: originHeaders,
-      contentMd5: content?.isNotEmpty == true ? base64.encode(md5.convert(content).bytes) : null,
     );
 
     var response = await http.put(
@@ -73,7 +73,8 @@ class OSSClient {
       encoding: encoding != null ? Encoding.getByName(encoding) : null,
     );
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('HTTP Error'); // TODO
+      print(response.body);
+      throw Exception('HTTP Error ${response.statusCode}'); // TODO
     }
     return response.body;
   }
@@ -92,7 +93,8 @@ class OSSClient {
       headers: signedHeaders,
     );
     if (response.statusCode != HttpStatus.ok) {
-      throw Exception('HTTP Error'); // TODO
+      print(response.body);
+      throw Exception('HTTP Error ${response.statusCode}'); // TODO
     }
     return response.bodyBytes;
   }
@@ -112,7 +114,7 @@ class OSSClient {
     );
     // FIXME Delete empty file fails
 //    if (response.statusCode != HttpStatus.ok) {
-//      throw Exception('HTTP Error'); // TODO
+//      throw Exception('HTTP Error ${response.statusCode}'); // TODO
 //    }
     return response.body;
   }

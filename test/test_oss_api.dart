@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +10,8 @@ var _ossClient = TestOSSClient();
 var bucket = Platform.environment['TEST_BUCKET'];
 var prefix = Platform.environment['TEST_PREFIX'];
 var objectKey = Platform.environment['TEST_OBJECT_KEY'];
+var content = utf8.encode('${DateTime.now().millisecondsSinceEpoch}');
+var objectContent = utf8.encode('${DateTime.now().millisecondsSinceEpoch}');
 
 void testOSSApi() {
   test('test getBucket', () async {
@@ -20,7 +23,7 @@ void testOSSApi() {
     var response = await _ossClient.putObject(
       bucket: bucket,
       objectKey: objectKey,
-      content: null, // FIXME
+      content: objectContent,
       contentType: ContentType.text.value,
     );
     expect(response, isNotNull);
@@ -28,7 +31,7 @@ void testOSSApi() {
 
   test('test getObject', () async {
     var responseData = await _ossClient.getObject(bucket, objectKey);
-    expect(responseData, isNotNull);
+    expect(responseData, objectContent);
   });
 
   test('test deleteObject', () async {
