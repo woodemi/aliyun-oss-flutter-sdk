@@ -3,8 +3,11 @@ import 'dart:typed_data';
 
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/sign.dart';
+import 'package:aliyun_oss/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
+
+import 'exception.dart';
 
 class OSSClient {
   String endpoint;
@@ -14,6 +17,14 @@ class OSSClient {
 
   @visibleForTesting
   Future<Credentials> getCredentials() => credentialProvider.getCredentials();
+
+  void _checkResponse(http.Response response) {
+    if (response.statusCode == HttpStatus.ok) return;
+
+    Map<String, Object> responseError = parkerDecode(response.body)['Error'];
+    // TODO ClientException
+    throw ServiceException(response.statusCode, responseError['Code']);
+  }
 
   // TODO Optional arguments
   Future<String> getBucket(String bucket, String prefix) async {
@@ -35,10 +46,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    if (response.statusCode != HttpStatus.ok) {
-      print(response.body);
-      throw Exception('HTTP Error ${response.statusCode}'); // TODO
-    }
+    _checkResponse(response);
     return response.body;
   }
 
@@ -70,10 +78,7 @@ class OSSClient {
       },
       body: content,
     );
-    if (response.statusCode != HttpStatus.ok) {
-      print(response.body);
-      throw Exception('HTTP Error ${response.statusCode}'); // TODO
-    }
+    _checkResponse(response);
     return response.body;
   }
 
@@ -90,10 +95,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    if (response.statusCode != HttpStatus.ok) {
-      print(response.body);
-      throw Exception('HTTP Error ${response.statusCode}'); // TODO
-    }
+    _checkResponse(response);
     return response.bodyBytes;
   }
 
@@ -111,9 +113,7 @@ class OSSClient {
       headers: signedHeaders,
     );
     // FIXME Delete empty file fails
-//    if (response.statusCode != HttpStatus.ok) {
-//      throw Exception('HTTP Error ${response.statusCode}'); // TODO
-//    }
+    // _checkResponse(response);
     return response.body;
   }
 }
