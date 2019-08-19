@@ -95,6 +95,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.7.0"
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.4.0"
   quiver:
     dependency: transitive
     description:
@@ -163,5 +170,19 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.8"
+  xml:
+    dependency: transitive
+    description:
+      name: xml
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.5.0"
+  xml2json:
+    dependency: "direct main"
+    description:
+      name: xml2json
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.3"
 sdks:
-  dart: ">=2.2.2 <3.0.0"
+  dart: ">=2.4.0 <3.0.0"
