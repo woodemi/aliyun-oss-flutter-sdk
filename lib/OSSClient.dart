@@ -19,7 +19,13 @@ class OSSClient {
   Future<Credentials> getCredentials() => credentialProvider.getCredentials();
 
   void _checkResponse(http.Response response) {
-    if (response.statusCode == HttpStatus.ok) return;
+    switch (response.statusCode) {
+      case HttpStatus.ok:
+      case HttpStatus.noContent:
+        return;
+      default:
+        break;
+    }
 
     Map<String, Object> responseError = parkerDecode(response.body)['Error'];
     // TODO ClientException
@@ -112,8 +118,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    // FIXME Delete empty file fails
-    // _checkResponse(response);
+    _checkResponse(response);
     return response.body;
   }
 }
