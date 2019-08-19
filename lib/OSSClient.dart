@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/sign.dart';
-import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
@@ -49,10 +47,11 @@ class OSSClient {
     @required String objectKey,
     @required Uint8List content,
     @required String contentType,
-    String encoding,
+    OSSCallbackRequest callback,
   }) async {
     var originHeaders = {
       HttpHeaders.contentTypeHeader: contentType,
+      ...(callback?.toHeaders() ?? {}),
     };
 
     var credentials = await getCredentials();
@@ -70,7 +69,6 @@ class OSSClient {
         ...safeHeaders,
       },
       body: content,
-      encoding: encoding != null ? Encoding.getByName(encoding) : null,
     );
     if (response.statusCode != HttpStatus.ok) {
       print(response.body);

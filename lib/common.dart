@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Credentials {
   final String accessKeyId;
   final String accessKeySecret;
@@ -33,4 +35,48 @@ abstract class FederationCredentialProvider implements CredentialProvider {
   }
 
   Future<FederationCredentials> fetchFederationCredentials();
+}
+
+class OSSCallbackRequest {
+  static const VAR_BUCKET = 'bucket';
+  static const VAR_OBJECT = 'object';
+  static const VAR_ETAG = 'etag';
+  static const VAR_SIZE = 'size';
+  static const VAR_MIMETYPE = 'mimeType';
+  static const VAR_IMAGEINFO_HEIGHT = 'imageInfo.height';
+  static const VAR_IMAGEINFO_WIDTH = 'imageInfo.width';
+  static const VAR_IMAGEINFO_FORMAT = 'imageInfo.format';
+
+  final String callbackUrl;
+
+  final String callbackHost;
+
+  final String callbackBody;
+
+  final String callbackBodyType;
+
+  final Map<String, String> callbackVars;
+
+  OSSCallbackRequest({
+    this.callbackUrl,
+    this.callbackHost,
+    this.callbackBody,
+    this.callbackBodyType,
+    this.callbackVars,
+  });
+
+  static final encoding = json.fuse(utf8.fuse(base64));
+
+  Map<String, String> toHeaders() {
+    var callbackParams = {
+      if (callbackUrl != null) 'callbackUrl': callbackUrl,
+      if (callbackHost != null) 'callbackHost': callbackHost,
+      if (callbackBody != null) 'callbackBody': callbackBody,
+      if (callbackBodyType != null) 'callbackBodyType': callbackBodyType,
+    };
+    return {
+      if (callbackParams.isNotEmpty) 'x-oss-callback': encoding.encode(callbackParams),
+      if (callbackVars != null) 'x-oss-callback-var': encoding.encode(callbackVars),
+    };
+  }
 }
