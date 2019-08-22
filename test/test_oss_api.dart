@@ -56,13 +56,3 @@ void testOSSApi() {
     expect(responseData, isNotNull);
   });
 }
-
-OSSCallbackRequest _buildCallbackRequest(String url, Map<String, String> params, Map<String, String> vars) {
-  var callbackBody = params.entries.map((e) => '${e.key}=\${${e.value}}').join('&');
-  var callbackAliaVars = vars.map((key, value) => MapEntry('x:$key', value));
-  return OSSCallbackRequest(
-    callbackUrl: url,
-    callbackBody: callbackBody,
-    callbackVars: callbackAliaVars,
-  );
-}
