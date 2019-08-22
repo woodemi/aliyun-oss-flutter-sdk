@@ -64,6 +64,26 @@ class OSSCallbackRequest {
     this.callbackBodyType,
     this.callbackVars,
   });
+  
+  factory OSSCallbackRequest.build(
+    String url, {
+    Map<String, String> systemParams,
+    Map<String, String> customVars,
+  }) {
+    systemParams = systemParams ?? {};
+    customVars = customVars ?? {};
+    
+    var aliasParams = customVars.map((key, value) => MapEntry(key, 'x:$key'));
+    var params = {...systemParams, ...aliasParams};
+    var callbackBody = params.entries.map((e) => '${e.key}=\${${e.value}}').join('&');
+
+    var aliasVars = customVars.map((key, value) => MapEntry('x:$key', value));
+    return OSSCallbackRequest(
+      callbackUrl: url,
+      callbackBody: callbackBody,
+      callbackVars: aliasVars,
+    );
+  }
 
   static final encoding = json.fuse(utf8.fuse(base64));
 
