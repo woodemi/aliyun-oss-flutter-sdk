@@ -21,17 +21,17 @@ void testOSSApi() {
   });
 
   test('test putObject', () async {
-    var callbackVars = {
+    var customVars = {
       'var1': 'val1',
     };
-    var callbackVarAlias = callbackVars.map((key, value) => MapEntry(key, 'x:$key'));
+    var callbackRequest = OSSCallbackRequest.build(
+      'https://postman-echo.com/post',
+      systemParams: {
+        'filename': OSSCallbackRequest.VAR_OBJECT,
+      },
+      customVars: customVars,
+    );
 
-    var callbackParams = {
-      'filename': OSSCallbackRequest.VAR_OBJECT,
-      ...callbackVarAlias,
-    };
-
-    var callbackRequest = _buildCallbackRequest('https://postman-echo.com/post', callbackParams, callbackVars);
     var response = await _ossClient.putObject(
       bucket: bucket,
       objectKey: objectKey,
@@ -42,8 +42,8 @@ void testOSSApi() {
 
     var responseForm = jsonDecode(response)['form'];
     expect(responseForm['filename'], objectKey);
-    for (final p in callbackVars.keys)
-      expect(responseForm[p], callbackVars[p]);
+    for (final p in customVars.keys)
+      expect(responseForm[p], customVars[p]);
   });
 
   test('test getObject', () async {
@@ -55,14 +55,4 @@ void testOSSApi() {
     var responseData = await _ossClient.deleteObject(bucket, objectKey);
     expect(responseData, isNotNull);
   });
-}
-
-OSSCallbackRequest _buildCallbackRequest(String url, Map<String, String> params, Map<String, String> vars) {
-  var callbackBody = params.entries.map((e) => '${e.key}=\${${e.value}}').join('&');
-  var callbackAliaVars = vars.map((key, value) => MapEntry('x:$key', value));
-  return OSSCallbackRequest(
-    callbackUrl: url,
-    callbackBody: callbackBody,
-    callbackVars: callbackAliaVars,
-  );
 }
