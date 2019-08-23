@@ -41,6 +41,11 @@ abstract class OSSConnection {
     ContentType contentType,
     Map<String, String> headers,
   });
+
+  Future<String> delete(
+    String url, {
+    Map<String, String> headers,
+  });
 }
 
 class HttpConnection extends OSSConnection {
@@ -81,6 +86,16 @@ class HttpConnection extends OSSConnection {
       },
       body: data,
     );
+    checkResponse(response.statusCode, response.body);
+    return response.body;
+  }
+
+  @override
+  Future<String> delete(
+    String url, {
+    Map<String, String> headers,
+  }) async {
+    var response = await http.delete(url, headers: headers);
     checkResponse(response.statusCode, response.body);
     return response.body;
   }
