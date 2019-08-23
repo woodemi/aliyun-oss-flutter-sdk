@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:aliyun_oss/common.dart';
+import 'package:aliyun_oss/connection.dart';
 import 'package:aliyun_oss/sign.dart';
 import 'package:aliyun_oss/utils.dart';
 import 'package:http/http.dart' as http;
@@ -18,8 +19,8 @@ class OSSClient {
   @visibleForTesting
   Future<Credentials> getCredentials() => credentialProvider.getCredentials();
 
-  void _checkResponse(http.Response response) {
-    switch (response.statusCode) {
+  void _checkResponse(int statusCode, String body) {
+    switch (statusCode) {
       case HttpStatus.ok:
       case HttpStatus.noContent:
         return;
@@ -27,9 +28,9 @@ class OSSClient {
         break;
     }
 
-    Map<String, Object> responseError = parkerDecode(response.body)['Error'];
+    Map<String, Object> responseError = parkerDecode(body)['Error'];
     // TODO ClientException
-    throw ServiceException(response.statusCode, responseError['Code']);
+    throw ServiceException(statusCode, responseError['Code']);
   }
 
   // TODO Optional arguments
@@ -48,12 +49,10 @@ class OSSClient {
     var queryString = queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
     var queryAppendix = (queryString != null ? '?$queryString' : '');
 
-    var response = await http.get(
+    return await OSSConnection.http.getString(
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    _checkResponse(response);
-    return response.body;
   }
 
   Future<String> putObject({
@@ -84,7 +83,7 @@ class OSSClient {
       },
       body: content,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.body;
   }
 
@@ -97,12 +96,10 @@ class OSSClient {
       resourcePath: '/$bucket/$objectKey',
     );
 
-    var response = await http.get(
-      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+    return await OSSConnection.http.getObject(
+      'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
       headers: signedHeaders,
     );
-    _checkResponse(response);
-    return response.bodyBytes;
   }
 
   Future<String> deleteObject(String bucket, String objectKey) async {
@@ -118,7 +115,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.body;
   }
 }
