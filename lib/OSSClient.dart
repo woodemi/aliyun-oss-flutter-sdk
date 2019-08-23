@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:aliyun_oss/common.dart';
+import 'package:aliyun_oss/connection.dart';
 import 'package:aliyun_oss/sign.dart';
 import 'package:aliyun_oss/utils.dart';
 import 'package:http/http.dart' as http;
@@ -48,12 +49,10 @@ class OSSClient {
     var queryString = queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
     var queryAppendix = (queryString != null ? '?$queryString' : '');
 
-    var response = await http.get(
+    return await OSSConnection.http.getString(
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    _checkResponse(response.statusCode, response.body);
-    return response.body;
   }
 
   Future<String> putObject({
