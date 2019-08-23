@@ -96,12 +96,10 @@ class OSSClient {
       resourcePath: '/$bucket/$objectKey',
     );
 
-    var response = await http.get(
-      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+    return await OSSConnection.http.getObject(
+      'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
       headers: signedHeaders,
     );
-    _checkResponse(response.statusCode, response.body);
-    return response.bodyBytes;
   }
 
   Future<String> deleteObject(String bucket, String objectKey) async {

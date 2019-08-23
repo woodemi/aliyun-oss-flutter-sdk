@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:aliyun_oss/utils.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,11 @@ abstract class OSSConnection {
     String url, {
     Map<String, String> headers,
   });
+
+  Future<Uint8List> getObject(
+    String url, {
+    Map<String, String> headers,
+  });
 }
 
 class HttpConnection extends OSSConnection {
@@ -41,5 +47,15 @@ class HttpConnection extends OSSConnection {
     var response = await http.get(url, headers: headers);
     checkResponse(response.statusCode, response.body);
     return response.body;
+  }
+
+  @override
+  Future<Uint8List> getObject(
+    String url, {
+    Map<String, String> headers,
+  }) async {
+    var response = await http.get(url, headers: headers);
+    checkResponse(response.statusCode, response.body);
+    return response.bodyBytes;
   }
 }
