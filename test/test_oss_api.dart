@@ -23,6 +23,7 @@ void testOSSApi() {
   test('test putObject', () async {
     var customVars = {
       'var1': 'val1',
+      'var2': '中文',
     };
     var callbackRequest = OSSCallbackRequest.build(
       'https://postman-echo.com/post',
