@@ -45,6 +45,16 @@ void main() {
     expect(requestData['type'], 'Buffer');
     expect(requestData['data'], binaryData);
   });
+
+  test('test delete', () async {
+    var response = await connection.delete(
+      'https://postman-echo.com/delete',
+      headers: headerTester.headers,
+    );
+    var responseContent = jsonDecode(response);
+
+    headerTester.check(responseContent);
+  });
 }
 
 final headerTester = HeaderTester();
