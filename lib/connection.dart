@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -34,6 +35,12 @@ abstract class OSSConnection {
     String url, {
     Map<String, String> headers,
   });
+
+  Future<Map> put(
+    String url, {
+    Uint8List data,
+    ContentType contentType,
+  });
 }
 
 class HttpConnection extends OSSConnection {
@@ -57,5 +64,21 @@ class HttpConnection extends OSSConnection {
     var response = await http.get(url, headers: headers);
     checkResponse(response.statusCode, response.body);
     return response.bodyBytes;
+  }
+
+  @override
+  Future<Map> put(
+    String url, {
+    Uint8List data,
+    ContentType contentType,
+  }) async {
+    var response = await http.put(
+      url,
+      headers: {
+        if (contentType != null) HttpHeaders.contentTypeHeader: contentType.toString(),
+      },
+      body: data,
+    );
+    return jsonDecode(response.body);
   }
 }

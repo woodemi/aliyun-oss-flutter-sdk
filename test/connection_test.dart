@@ -24,6 +24,13 @@ void main() {
     for (final e in headers.entries)
       expect(requestHeaders[e.key], headers[e.key]);
   });
+
+  test('test put', () async {
+    var response = await connection.put('https://postman-echo.com/put', data: binaryData, contentType: ContentType.binary);
+    Map requestData = response['data'];
+    expect(requestData['type'], 'Buffer');
+    expect(requestData['data'], binaryData);
+  });
 }
 
 Map<String, String> _buildCustomHeaders() {
