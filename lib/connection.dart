@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -11,7 +12,11 @@ abstract class OSSConnection {
 
   static final OSSConnection http = HttpConnection();
 
-  void checkResponse(int statusCode, String body) {
+  /// Check [statusCode] is 2XX of [HttpStatus]
+  /// Or parse body string for error message
+  ///
+  /// Use function [getBodyString] for lazy parsing
+  void checkResponse(int statusCode, String getBodyString()) {
     switch (statusCode) {
       case HttpStatus.ok:
       case HttpStatus.noContent:
@@ -20,6 +25,7 @@ abstract class OSSConnection {
         break;
     }
 
+    var body = getBodyString();
     Map<String, Object> responseError = parkerDecode(body)['Error'];
     // TODO ClientException
     throw ServiceException(statusCode, responseError['Code']);
@@ -57,8 +63,8 @@ class HttpConnection extends OSSConnection {
     Map<String, String> headers,
   }) async {
     var response = await http.get(url, headers: headers);
-    checkResponse(response.statusCode, response.body);
-    return response.body;
+    checkResponse(response.statusCode, () => bodyUtf8(response));
+    return bodyUtf8(response);
   }
 
   @override
@@ -67,7 +73,7 @@ class HttpConnection extends OSSConnection {
     Map<String, String> headers,
   }) async {
     var response = await http.get(url, headers: headers);
-    checkResponse(response.statusCode, response.body);
+    checkResponse(response.statusCode, () => bodyUtf8(response));
     return response.bodyBytes;
   }
 
@@ -86,8 +92,8 @@ class HttpConnection extends OSSConnection {
       },
       body: data,
     );
-    checkResponse(response.statusCode, response.body);
-    return response.body;
+    checkResponse(response.statusCode, () => bodyUtf8(response));
+    return bodyUtf8(response);
   }
 
   @override
@@ -96,7 +102,13 @@ class HttpConnection extends OSSConnection {
     Map<String, String> headers,
   }) async {
     var response = await http.delete(url, headers: headers);
-    checkResponse(response.statusCode, response.body);
-    return response.body;
+    checkResponse(response.statusCode, () => bodyUtf8(response));
+    return bodyUtf8(response);
   }
+
+  /// Decode [http.Response] with [utf8]
+  ///
+  /// [http.Response] default to [latin1] when charset missing in [ContentType]
+  /// In which case chars in [utf8] may cause error
+  String bodyUtf8(http.Response response) => utf8.decode(response.bodyBytes);
 }
