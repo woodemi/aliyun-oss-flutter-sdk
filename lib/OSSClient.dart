@@ -4,11 +4,7 @@ import 'dart:typed_data';
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/connection.dart';
 import 'package:aliyun_oss/sign.dart';
-import 'package:aliyun_oss/utils.dart';
-import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-
-import 'exception.dart';
 
 class OSSClient {
   String endpoint;
@@ -18,20 +14,6 @@ class OSSClient {
 
   @visibleForTesting
   Future<Credentials> getCredentials() => credentialProvider.getCredentials();
-
-  void _checkResponse(int statusCode, String body) {
-    switch (statusCode) {
-      case HttpStatus.ok:
-      case HttpStatus.noContent:
-        return;
-      default:
-        break;
-    }
-
-    Map<String, Object> responseError = parkerDecode(body)['Error'];
-    // TODO ClientException
-    throw ServiceException(statusCode, responseError['Code']);
-  }
 
   // TODO Optional arguments
   Future<String> getBucket(String bucket, String prefix) async {
@@ -109,11 +91,9 @@ class OSSClient {
       resourcePath: '/$bucket/$objectKey',
     );
 
-    var response = await http.delete(
-      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+    return OSSConnection.http.delete(
+      'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
       headers: signedHeaders,
     );
-    _checkResponse(response.statusCode, response.body);
-    return response.body;
   }
 }
