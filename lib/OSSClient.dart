@@ -18,8 +18,8 @@ class OSSClient {
   @visibleForTesting
   Future<Credentials> getCredentials() => credentialProvider.getCredentials();
 
-  void _checkResponse(http.Response response) {
-    switch (response.statusCode) {
+  void _checkResponse(int statusCode, String body) {
+    switch (statusCode) {
       case HttpStatus.ok:
       case HttpStatus.noContent:
         return;
@@ -27,9 +27,9 @@ class OSSClient {
         break;
     }
 
-    Map<String, Object> responseError = parkerDecode(response.body)['Error'];
+    Map<String, Object> responseError = parkerDecode(body)['Error'];
     // TODO ClientException
-    throw ServiceException(response.statusCode, responseError['Code']);
+    throw ServiceException(statusCode, responseError['Code']);
   }
 
   // TODO Optional arguments
@@ -52,7 +52,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.body;
   }
 
@@ -84,7 +84,7 @@ class OSSClient {
       },
       body: content,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.body;
   }
 
@@ -101,7 +101,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.bodyBytes;
   }
 
@@ -118,7 +118,7 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
       headers: signedHeaders,
     );
-    _checkResponse(response);
+    _checkResponse(response.statusCode, response.body);
     return response.body;
   }
 }
