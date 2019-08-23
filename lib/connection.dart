@@ -34,6 +34,13 @@ abstract class OSSConnection {
     String url, {
     Map<String, String> headers,
   });
+
+  Future<String> putObject(
+    String url, {
+    Uint8List data,
+    ContentType contentType,
+    Map<String, String> headers,
+  });
 }
 
 class HttpConnection extends OSSConnection {
@@ -57,5 +64,24 @@ class HttpConnection extends OSSConnection {
     var response = await http.get(url, headers: headers);
     checkResponse(response.statusCode, response.body);
     return response.bodyBytes;
+  }
+
+  @override
+  Future<String> putObject(
+    String url, {
+    Uint8List data,
+    ContentType contentType,
+    Map<String, String> headers,
+  }) async {
+    var response = await http.put(
+      url,
+      headers: {
+        ...(headers ?? {}),
+        if (contentType != null) HttpHeaders.contentTypeHeader: contentType.toString(),
+      },
+      body: data,
+    );
+    checkResponse(response.statusCode, response.body);
+    return response.body;
   }
 }

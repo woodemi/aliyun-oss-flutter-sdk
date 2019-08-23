@@ -75,16 +75,14 @@ class OSSClient {
       headers: originHeaders,
     );
 
-    var response = await http.put(
-      "http://$bucket.${Uri.parse(endpoint).authority}/$objectKey",
+    return await OSSConnection.http.putObject(
+      'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
+      data: content,
       headers: {
         ...originHeaders,
         ...safeHeaders,
       },
-      body: content,
     );
-    _checkResponse(response.statusCode, response.body);
-    return response.body;
   }
 
   Future<Uint8List> getObject(String bucket, String objectKey) async {
