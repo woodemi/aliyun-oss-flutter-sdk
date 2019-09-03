@@ -6,6 +6,8 @@ import 'package:aliyun_oss/connection.dart';
 import 'package:aliyun_oss/sign.dart';
 import 'package:meta/meta.dart';
 
+import 'utils.dart';
+
 class OSSClient {
   String endpoint;
   CredentialProvider credentialProvider;
@@ -35,6 +37,29 @@ class OSSClient {
       "http://$bucket.${Uri.parse(endpoint).authority}/$queryAppendix",
       headers: signedHeaders,
     );
+  }
+
+  Future<String> signUrl(
+    String bucket,
+    String objectKey, {
+    @required String httpMethod,
+    int expireSeconds = 3600,
+  }) async {
+    assert(httpMethod == 'PUT' || httpMethod == 'GET');
+
+    var credentials = await getCredentials();
+
+    var signer = Signer(credentials);
+    var secondsSinceEpoch = DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
+    var signedParams = signer.sign(
+      httpMethod: httpMethod,
+      resourcePath: '/$bucket/$objectKey',
+      dateString: '${secondsSinceEpoch + expireSeconds}',
+      signType: SignType.signUrl,
+    ).toQueryParams();
+
+    var queryString = signedParams.entries.map((e) => '${e.key}=${ossUrlEncode(e.value)}').join('&');
+    return 'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey?$queryString';
   }
 
   Future<String> putObject({
