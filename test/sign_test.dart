@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/sign.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,8 +14,8 @@ void main() {
     var signedHeaders = signer.sign(
       httpMethod: 'GET',
       resourcePath: '/smartnotep/a.log',
-      dateTime: HttpDate.parse('Thu, 15 Aug 2019 07:23:49 GMT'),
-    );
+      dateString: 'Thu, 15 Aug 2019 07:23:49 GMT',
+    ).toHeaders();
     expect(signedHeaders['Authorization'], 'OSS STS.NJL73vuxoDZDx4448RoWsUcgt:utdhPGcP3vLGjkWTnD1+10Tg7rI=');
   });
 

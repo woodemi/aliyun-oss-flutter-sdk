@@ -23,7 +23,7 @@ class OSSClient {
     var signedHeaders = signer.sign(
       httpMethod: 'GET',
       resourcePath: '/$bucket/',
-    );
+    ).toHeaders();
 
     var queryParams = {
       'prefix': prefix,
@@ -55,7 +55,7 @@ class OSSClient {
       httpMethod: 'PUT',
       resourcePath: '/$bucket/$objectKey',
       headers: originHeaders,
-    );
+    ).toHeaders();
 
     return await OSSConnection.http.putObject(
       'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
@@ -74,7 +74,7 @@ class OSSClient {
     var signedHeaders = signer.sign(
       httpMethod: 'GET',
       resourcePath: '/$bucket/$objectKey',
-    );
+    ).toHeaders();
 
     return await OSSConnection.http.getObject(
       'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
@@ -89,7 +89,7 @@ class OSSClient {
     var signedHeaders = signer.sign(
       httpMethod: 'DELETE',
       resourcePath: '/$bucket/$objectKey',
-    );
+    ).toHeaders();
 
     return OSSConnection.http.delete(
       'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
