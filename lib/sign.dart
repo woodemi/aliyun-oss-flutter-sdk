@@ -17,6 +17,7 @@ class Signer {
     Map<String, String> parameters,
     Map<String, Object> headers,
     String contentMd5,
+    DateTime dateTime,
   }) {
     assert(httpMethod != null);
     assert(resourcePath != null);
@@ -39,7 +40,7 @@ class Signer {
 
     var canonicalizedResource = _buildCanonicalizedResource(resourcePath, parameters);
 
-    var date = getDate();
+    var date = HttpDate.format(dateTime ?? DateTime.now());
     var canonicalString = [
       httpMethod,
       contentMd5 ?? '',
@@ -56,9 +57,6 @@ class Signer {
       if (credentials.securityToken != null) 'x-oss-security-token': credentials.securityToken,
     };
   }
-
-  @visibleForTesting
-  String getDate() => HttpDate.format(DateTime.now());
 
   String _buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
     // TODO Add parameters

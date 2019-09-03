@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aliyun_oss/common.dart';
 import 'package:aliyun_oss/sign.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,13 +10,13 @@ var _securityToken = 'CAIShgl1q6Ft5B2yfSjIr4n5fInCmKdO85ivehKF0DgHY9hfuqbMljz2IH
 
 final _credentials = Credentials(_accessKeyId, _accessKeySecret, _securityToken);
 
-void testSign() {
+void main() {
   test('test sign', () {
-    var signer = TestSigner(_credentials)
-      ..date = 'Thu, 15 Aug 2019 07:23:49 GMT';
+    var signer = Signer(_credentials);
     var signedHeaders = signer.sign(
       httpMethod: 'GET',
       resourcePath: '/smartnotep/a.log',
+      dateTime: HttpDate.parse('Thu, 15 Aug 2019 07:23:49 GMT'),
     );
     expect(signedHeaders['Authorization'], 'OSS STS.NJL73vuxoDZDx4448RoWsUcgt:utdhPGcP3vLGjkWTnD1+10Tg7rI=');
   });
@@ -22,13 +24,4 @@ void testSign() {
   test('test sign v2', () {
     // TODO
   });
-}
-
-class TestSigner extends Signer {
-  TestSigner(Credentials credentials) : super(credentials);
-
-  String date;
-
-  @override
-  String getDate() => date;
 }
