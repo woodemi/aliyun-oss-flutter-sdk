@@ -8,27 +8,29 @@ var _securityToken = 'CAIShgl1q6Ft5B2yfSjIr4n5fInCmKdO85ivehKF0DgHY9hfuqbMljz2IH
 
 final _credentials = Credentials(_accessKeyId, _accessKeySecret, _securityToken);
 
-void testSign() {
-  test('test sign', () {
-    var signer = TestSigner(_credentials)
-      ..date = 'Thu, 15 Aug 2019 07:23:49 GMT';
+void main() {
+  test('test sign header', () {
+    var signer = Signer(_credentials);
     var signedHeaders = signer.sign(
       httpMethod: 'GET',
       resourcePath: '/smartnotep/a.log',
-    );
-    expect(signedHeaders['Authorization'], 'OSS STS.NJL73vuxoDZDx4448RoWsUcgt:utdhPGcP3vLGjkWTnD1+10Tg7rI=');
+      dateString: 'Thu, 15 Aug 2019 07:23:49 GMT',
+    ).toHeaders();
+    expect(signedHeaders['Authorization'], 'OSS $_accessKeyId:utdhPGcP3vLGjkWTnD1+10Tg7rI=');
+  });
+
+  test('test sign url', () {
+    var signer = Signer(_credentials);
+    var signedParams = signer.sign(
+      httpMethod: 'GET',
+      resourcePath: '/smartnotep/a.log',
+      dateString: 'Thu, 15 Aug 2019 07:23:49 GMT',
+      signType: SignType.signUrl,
+    ).toQueryParams();
+    expect(signedParams['Signature'], 'etLjVNLCAMR+rb/C4tv7VedoKs0=');
   });
 
   test('test sign v2', () {
     // TODO
   });
-}
-
-class TestSigner extends Signer {
-  TestSigner(Credentials credentials) : super(credentials);
-
-  String date;
-
-  @override
-  String getDate() => date;
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:aliyun_oss/common.dart';
+import 'package:aliyun_oss/connection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'TestOSSClient.dart';
@@ -45,6 +46,12 @@ void testOSSApi() {
     expect(responseForm['filename'], objectKey);
     for (final p in customVars.keys)
       expect(responseForm[p], customVars[p]);
+  });
+
+  test('test signUrl get', () async {
+    var url = await _ossClient.signUrl(bucket, objectKey, httpMethod: 'GET', expireSeconds: 60);
+    var responseData = await OSSConnection.http.getObject(url);
+    expect(responseData, objectContent);
   });
 
   test('test getObject', () async {
