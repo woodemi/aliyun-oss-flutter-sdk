@@ -58,8 +58,7 @@ class OSSClient {
       signType: SignType.signUrl,
     ).toQueryParams();
 
-    var queryString = signedParams.entries.map((e) => '${e.key}=${ossUrlEncode(e.value)}').join('&');
-    return 'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey?$queryString';
+    return appendQueryParams('http://$bucket.${Uri.parse(endpoint).authority}/$objectKey', signedParams);
   }
 
   Future<String> putObject({
@@ -92,17 +91,25 @@ class OSSClient {
     );
   }
 
-  Future<Uint8List> getObject(String bucket, String objectKey) async {
+  Future<Uint8List> getObject(
+    String bucket,
+    String objectKey, {
+    String process,
+  }) async {
     var credentials = await getCredentials();
 
-    var signer = Signer(credentials);
-    var signedHeaders = signer.sign(
+    var queryParameters = {
+      if (process != null) 'x-oss-process': process,
+    };
+    var signedHeaders = Signer(credentials).sign(
       httpMethod: 'GET',
       resourcePath: '/$bucket/$objectKey',
+      parameters: queryParameters
     ).toHeaders();
 
+    var path = 'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey';
     return await OSSConnection.http.getObject(
-      'http://$bucket.${Uri.parse(endpoint).authority}/$objectKey',
+      appendQueryParams(path, queryParameters),
       headers: signedHeaders,
     );
   }
