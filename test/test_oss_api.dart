@@ -54,9 +54,20 @@ void testOSSApi() {
     expect(responseData, objectContent);
   });
 
+  test('test signUrl get with process', () async {
+    var url = await _ossClient.signUrl('smartnotep', 'b78a/100026731/primary.png', httpMethod: 'GET', expireSeconds: 60, process: 'image/resize,w_100');
+    var responseData = await OSSConnection.http.getObject(url);
+    expect(responseData.length, 6254);
+  });
+
   test('test getObject', () async {
     var responseData = await _ossClient.getObject(bucket, objectKey);
     expect(responseData, objectContent);
+  });
+
+  test('test getObject with process', () async {
+    var responseData = await _ossClient.getObject('smartnotep', 'b78a/100026731/primary.png', process: 'image/resize,w_100');
+    expect(responseData.length, 6254);
   });
 
   test('test deleteObject', () async {
