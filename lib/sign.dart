@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:aliyun_oss/utils.dart';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 
@@ -54,7 +55,7 @@ class Signer {
     @required String httpMethod,
     @required String resourcePath,
     Map<String, String> parameters,
-    Map<String, Object> headers,
+    Map<String, String> headers,
     String contentMd5,
     String dateString,
     SignType signType = SignType.signHeader,
@@ -67,14 +68,12 @@ class Signer {
       if (credentials.securityToken != null && signType == SignType.signHeader)
         SignedInfo.headerSecurityToken: credentials.securityToken,
     };
-    var sortedPairs = securityHeaders.entries
-        .map((e) => MapEntry(e.key.toLowerCase().trim(), e.value.toString().trim()))
-        .toList()..sort((a, b) => a.key.compareTo(b.key));
-    var contentType = sortedPairs.firstWhere(
+    var sortedHeaders = sortByLowerKey(securityHeaders);
+    var contentType = sortedHeaders.firstWhere(
       (e) => e.key == HttpHeaders.contentTypeHeader,
       orElse: () => MapEntry('', ''),
     ).value;
-    var canonicalizedOSSHeaders = sortedPairs
+    var canonicalizedOSSHeaders = sortedHeaders
         .where((e) => e.key.startsWith('x-oss-'))
         .map((e) => '${e.key}:${e.value}')
         .join('\n');
@@ -107,7 +106,7 @@ class Signer {
 
   String _buildCanonicalizedResource(String resourcePath, Map<String, String> parameters) {
     if (parameters?.isNotEmpty == true) {
-      var queryString = parameters.entries.map((e) => '${e.key}=${e.value}').join('&');
+      var queryString = sortByLowerKey(parameters).map((e) => '${e.key}=${e.value}').join('&');
       return '$resourcePath?$queryString';
     }
     return resourcePath;
