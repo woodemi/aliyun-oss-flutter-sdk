@@ -44,21 +44,30 @@ class OSSClient {
     String objectKey, {
     @required String httpMethod,
     int expireSeconds = 3600,
+    String process,
   }) async {
     assert(httpMethod == 'PUT' || httpMethod == 'GET');
+    var originParams = {
+      if (process != null) 'x-oss-process': process,
+    };
 
     var credentials = await getCredentials();
 
     var signer = Signer(credentials);
     var secondsSinceEpoch = DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
-    var signedParams = signer.sign(
+    var safeParams = signer.sign(
       httpMethod: httpMethod,
       resourcePath: '/$bucket/$objectKey',
+      parameters: originParams,
       dateString: '${secondsSinceEpoch + expireSeconds}',
       signType: SignType.signUrl,
     ).toQueryParams();
 
-    return appendQueryParams('http://$bucket.${Uri.parse(endpoint).authority}/$objectKey', signedParams);
+    var queryParams = {
+      ...safeParams,
+      ...originParams,
+    };
+    return appendQueryParams('http://$bucket.${Uri.parse(endpoint).authority}/$objectKey', queryParams);
   }
 
   Future<String> putObject({
