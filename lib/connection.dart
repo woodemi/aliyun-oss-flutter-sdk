@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:aliyun_oss/utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'exception.dart';
+import 'utils.dart';
 
 abstract class OSSConnection {
   OSSConnection._();

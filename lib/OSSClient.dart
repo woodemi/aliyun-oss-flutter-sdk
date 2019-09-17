@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:aliyun_oss/common.dart';
-import 'package:aliyun_oss/connection.dart';
-import 'package:aliyun_oss/sign.dart';
 import 'package:meta/meta.dart';
 
+import 'common.dart';
+import 'connection.dart';
+import 'sign.dart';
 import 'utils.dart';
 
 class OSSClient {
