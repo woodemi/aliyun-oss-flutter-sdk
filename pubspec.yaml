@@ -1,15 +1,18 @@
 name: aliyun_oss
 description: A new Flutter package project.
-version: 0.0.1
+version: 0.1.0
 author:
 homepage:
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  crypto: ^2.0.6
+  http: ^0.12.0
+  xml2json: ^3.0.3
 
 dev_dependencies:
   flutter_test:
