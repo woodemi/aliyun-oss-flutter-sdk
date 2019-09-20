@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:aliyun_oss/utils.dart';
 import 'package:crypto/crypto.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:meta/meta.dart';
 
 import 'common.dart';
@@ -70,7 +70,7 @@ class Signer {
     };
     var sortedHeaders = sortByLowerKey(securityHeaders);
     var contentType = sortedHeaders.firstWhere(
-      (e) => e.key == HttpHeaders.contentTypeHeader,
+      (e) => e.key == 'content-type',
       orElse: () => MapEntry('', ''),
     ).value;
     var canonicalizedOSSHeaders = sortedHeaders
@@ -85,7 +85,7 @@ class Signer {
     };
     var canonicalizedResource = _buildCanonicalizedResource(resourcePath, securityParameters);
 
-    var date = dateString ?? HttpDate.format(DateTime.now());
+    var date = dateString ?? formatHttpDate(DateTime.now());
     var canonicalString = [
       httpMethod,
       contentMd5 ?? '',
