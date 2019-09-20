@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -18,8 +17,8 @@ abstract class OSSConnection {
   /// Use function [getBodyString] for lazy parsing
   void checkResponse(int statusCode, String getBodyString()) {
     switch (statusCode) {
-      case HttpStatus.ok:
-      case HttpStatus.noContent:
+      case 200:
+      case 204:
         return;
       default:
         break;
@@ -44,7 +43,6 @@ abstract class OSSConnection {
   Future<String> putObject(
     String url, {
     Uint8List data,
-    ContentType contentType,
     Map<String, String> headers,
   });
 
@@ -81,15 +79,11 @@ class HttpConnection extends OSSConnection {
   Future<String> putObject(
     String url, {
     Uint8List data,
-    ContentType contentType,
     Map<String, String> headers,
   }) async {
     var response = await http.put(
       url,
-      headers: {
-        ...(headers ?? {}),
-        if (contentType != null) HttpHeaders.contentTypeHeader: contentType.toString(),
-      },
+      headers: headers,
       body: data,
     );
     checkResponse(response.statusCode, () => bodyUtf8(response));
