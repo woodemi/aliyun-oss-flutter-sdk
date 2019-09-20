@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -78,7 +77,7 @@ class OSSClient {
     OSSCallbackRequest callback,
   }) async {
     var originHeaders = {
-      HttpHeaders.contentTypeHeader: contentType,
+      'content-type': contentType,
       ...(callback?.toHeaders() ?? {}),
     };
 

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:aliyun_oss/connection.dart';
@@ -34,8 +33,10 @@ void main() {
     var response = await connection.putObject(
       'https://postman-echo.com/put',
       data: binaryData,
-      contentType: ContentType.binary,
-      headers: headerTester.headers,
+      headers: {
+        'content-type': 'application/octet-stream',
+        ...headerTester.headers,
+      },
     );
     var responseContent = jsonDecode(response);
 
