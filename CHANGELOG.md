@@ -1,3 +1,6 @@
+## [0.1.2] - 2020.12.30
+- Upgrade: plugin xml2json upgrade
+
 ## [0.1.1] - 2019.09.20
 - Remove `dart:io` for flutter web
 
